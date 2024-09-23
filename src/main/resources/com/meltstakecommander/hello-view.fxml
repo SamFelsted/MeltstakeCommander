@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.layout.VBox?>
+
+<?import javafx.scene.control.Button?>
+
+
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.text.Text?>
+<VBox alignment="TOP_CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.meltstakecommander.HelloController">
+  <padding>
+    <Insets bottom="5.0" left="20.0" right="20.0" top="5.0"/>
+  </padding>
+
+  <ImageView fx:id="ivLogo" fitHeight="100" fitWidth="500">
+    <image>
+      <Image fx:id="iLogo" url="@meltstake.png"/>
+    </image>
+  </ImageView>
+
+  <HBox alignment="CENTER" spacing="10">
+    <Button fx:id="connectionButton" text="Not Connected (click to connect)" onAction="#onConnectButtonClick"/>
+    <Button fx:id="configButton" text="⚙️" onAction="#onSendDrillButtonClick"/>
+  </HBox>
+
+  <VBox alignment="CENTER_LEFT" spacing="20">
+
+    <HBox alignment="CENTER_LEFT" spacing="7">
+      <Text text="Number of turns: L"/>
+      <TextField fx:id="rightTurns" maxWidth="50"/>
+      <Text text="R"/>
+      <TextField fx:id="leftTurns" maxWidth="50"/>
+      <Button text="DRILL" onAction="#onConnectButtonClick"/>
+    </HBox>
+
+    <Button text="RELEASE" maxWidth="100"/>
+    <Button text="OFF" onAction="#onSendLightButtonClick" maxWidth="100"/>
+
+    <Button text="LIGHT TEST" maxWidth="100"/>
+
+    <HBox alignment="CENTER_LEFT" spacing="10">
+      <TextArea/>
+      <Button text="Send" onAction="#onConnectButtonClick"/>
+    </HBox>
+
+  </VBox>
+
+</VBox>
