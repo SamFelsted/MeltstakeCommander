@@ -1,0 +1,37 @@
+#Main {
+    -fx-background-color: #e4e4e4;
+}
+
+.vbox {
+
+}
+
+.CommandButton {
+    -fx-font-size: 25;
+    -fx-text-fill: BLACK;
+    -fx-font-weight: bold;
+}
+
+#timer {
+    -fx-font-family: Roboto Mono;
+    -fx-font-size: 30;
+    -fx-font-weight: bold;
+}
+
+.release {
+    -fx-font-family: Roboto Mono;
+    -fx-font-size: 25;
+    -fx-text-fill: red;
+    -fx-font-weight: bold;
+}
+
+.label, .button, .ToggleButton {
+    -fx-font-family: Roboto Mono;
+    -fx-font-size: 12;
+}
+
+.text, .TextField, .TextArea{
+    -fx-font-family: Roboto Mono;
+    -fx-font-size: 12;
+    -fx-text-fill: white;
+}
