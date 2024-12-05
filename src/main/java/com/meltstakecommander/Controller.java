@@ -26,7 +26,9 @@ import java.util.Objects;
 
 /**
  * This is the back end of the view.fxml
- * There are
+ * There are 2 primary helper classes
+ * SettingsLoader - loads settings data from files
+ * Client - interfaces with the ROV/Meltstake networking
  */
 public class Controller {
     SettingsLoader s = new SettingsLoader();
@@ -36,7 +38,7 @@ public class Controller {
     public boolean autoRelease = true;
     public boolean releasing = false;
 
-    Timeline timertimeline = new Timeline();
+    Timeline timerTimeline = new Timeline();
 
     @FXML
     VBox Main;
@@ -54,8 +56,6 @@ public class Controller {
     Button configButton;
     @FXML
     Text timer;
-    @FXML
-    ToggleButton autoReleaseButton;
     @FXML
     TextField rpdField;
     @FXML
@@ -76,7 +76,6 @@ public class Controller {
     TextField currentInput;
     @FXML
     TextField lsThreshInput;
-
 
     @FXML
     protected void onSendOffButtonClick() {
@@ -139,20 +138,8 @@ public class Controller {
 
     @FXML
     protected void onConnectButtonClick() {
-        connectionButton.setText(c.testConnection() ? "Connected" : "Not Connected (click to connect)");
+        connectionButton.setText(c.testConnection() ? "Beacon Connected" : "Beacon NOT Connected (click to connect)");
     }
-
-    @FXML
-    protected void onToggleRelease() {
-        if (releasing) {
-            autoReleaseButton.setSelected(true);
-            return;
-        }
-        stopTimerAnimation();
-        autoRelease = autoReleaseButton.isSelected();
-        c.sendData(Commands.getDisengageToggle(c.getAntennaID(), autoReleaseButton.isSelected()));
-    }
-
 
     @FXML
     protected void onCustomSendButtonClick(){
@@ -174,10 +161,9 @@ public class Controller {
 
 
     private void stopTimerAnimation() {
-        //timer.setVisible(false);
         releasing = false;
-        timertimeline.getKeyFrames().clear();
-        timertimeline.stop();
+        timerTimeline.getKeyFrames().clear();
+        timerTimeline.stop();
         timer.applyCss();
     }
 
@@ -188,7 +174,7 @@ public class Controller {
         timer.setFont(Font.font("ROBOTO MONO", FontWeight.BOLD, 15));
        //timer.setVisible(true);
 
-        timertimeline.getKeyFrames().add(
+        timerTimeline.getKeyFrames().add(
                 new KeyFrame(Duration.millis(700),
                         e -> {
                             if (timer.getFill() == Color.BLACK) {
@@ -199,10 +185,9 @@ public class Controller {
                         }
         ));
 
-        timertimeline.setCycleCount(Animation.INDEFINITE);
-        timertimeline.play();
+        timerTimeline.setCycleCount(Animation.INDEFINITE);
+        timerTimeline.play();
     }
-
 
     protected void startTimer() {
         if (!autoRelease) {
@@ -215,20 +200,22 @@ public class Controller {
 
         timer.setFill(Color.BLACK);
 
-        timertimeline.getKeyFrames().add(
+        timerTimeline.getKeyFrames().add(
             new KeyFrame(Duration.millis((double) Integer.parseInt(s.getData().get("refreshRate").toString()) / 2),
                     e -> {
                         java.time.Duration remaining = java.time.Duration.between(LocalTime.now(), end);
                         if (!remaining.isNegative()) {
+                            if (remaining.toMinutesPart() == 0) {
+                                timer.setFill(Color.RED);
+                            }
                             timer.setText(String.format("%02d:%02d", remaining.toMinutesPart(), remaining.toSecondsPart()));
                         } else {
                             startReleaseAnimation();
                         }
                     })
         );
-        timertimeline.setCycleCount(Animation.INDEFINITE);
-        timertimeline.play();
-        //timer.setVisible(true);
+        timerTimeline.setCycleCount(Animation.INDEFINITE);
+        timerTimeline.play();
     }
 
 
@@ -237,7 +224,7 @@ public class Controller {
         String data = c.getReceivedData();
 
         if (data != null) {
-            connectionButton.setText("Connected");
+            connectionButton.setText("Beacon Connected");
             addMessages(data);
             refreshClient();
         }
@@ -250,13 +237,9 @@ public class Controller {
             if (Objects.equals(timer.getText(), "AUTO RELEASE DISABLED")) {
                 timer.setText("00:00");
             }
-            autoReleaseButton.setText("Auto Release ON");
-            autoReleaseButton.setSelected(true);
         }
         if (!c.getConfirmedARovrdStatus()) {
             timer.setText("AUTO RELEASE DISABLED");
-            autoReleaseButton.setText("Auto Release OFF");
-            autoReleaseButton.setSelected(false);
         }
 
         dataDisplay1.setText(c.getDataDisplay1());
@@ -279,6 +262,38 @@ public class Controller {
 
     @FXML
     protected void openSettings() {
+
+        ToggleButton autoReleaseButton = new ToggleButton("A");
+        autoReleaseButton.setAlignment(Pos.CENTER);
+        autoReleaseButton.setMinWidth(200);
+        autoReleaseButton.setMinHeight(40);
+
+        autoReleaseButton.setOnAction(event -> {
+            if (releasing) {
+                autoReleaseButton.setSelected(true);
+                return;
+            }
+            stopTimerAnimation();
+            autoRelease = autoReleaseButton.isSelected();
+            c.sendData(Commands.getDisengageToggle(c.getAntennaID(), autoReleaseButton.isSelected()));
+        });
+
+        Timeline autoEngageRefresh = new Timeline(
+                new KeyFrame(Duration.millis(Integer.parseInt(s.getData().get("refreshRate").toString())),
+                        e -> {
+                            if (c.getConfirmedARovrdStatus()) {
+                                autoReleaseButton.setText("Auto Release ON");
+                                autoReleaseButton.setSelected(true);
+                            }
+                            if (!c.getConfirmedARovrdStatus()) {
+                                autoReleaseButton.setText("Auto Release OFF");
+                                autoReleaseButton.setSelected(false);
+                            }
+                        }
+                )
+        );
+
+
         if (!settingsOpened) {
             Map<String, TextArea> inputs = new HashMap<>();
             settingsOpened = true;
@@ -293,8 +308,10 @@ public class Controller {
             settingsBox.setSpacing(10);
             settingsBox.setPadding(new Insets(10, 10, 10, 10));
 
-            Map<String, Object> data = s.getData();
 
+            settingsBox.getChildren().add(autoReleaseButton);
+
+            Map<String, Object> data = s.getData();
 
             for (String key : data.keySet()) {
                 TextArea input = new TextArea(data.get(key).toString());
@@ -305,6 +322,8 @@ public class Controller {
 
             Button saveButton = new Button("Save");
             saveButton.setAlignment(Pos.CENTER);
+            saveButton.setMinWidth(250);
+            saveButton.setMinHeight(40);
             saveButton.setOnAction(event -> {
                 for (String key : data.keySet()) {
                     String param = inputs.get(key).getText();
@@ -327,8 +346,13 @@ public class Controller {
             settingsStage.setScene(settingsScene);
             settingsStage.show();
 
+            autoEngageRefresh.setCycleCount(Animation.INDEFINITE);
+            autoEngageRefresh.play();
 
-            settingsStage.setOnCloseRequest(t -> settingsOpened = false);
+            settingsStage.setOnCloseRequest(t -> {
+                settingsOpened = false;
+                autoEngageRefresh.stop();
+            });
         }
 
     }
