@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch4jConfig>
+  <dontWrapJar>false</dontWrapJar>
+  <headerType>gui</headerType>
+  <jar>C:\Users\ROSS\MeltstakeCommander\target\MeltstakeCommander-1.0.jar</jar>
+  <outfile>C:\Users\ROSS\Desktop\MeltStakeCommander\MeltStakeCommander.exe</outfile>
+  <errTitle></errTitle>
+  <cmdLine></cmdLine>
+  <chdir>.</chdir>
+  <priority>normal</priority>
+  <downloadUrl></downloadUrl>
+  <supportUrl></supportUrl>
+  <stayAlive>false</stayAlive>
+  <restartOnCrash>false</restartOnCrash>
+  <manifest></manifest>
+  <icon>C:\Users\ROSS\MeltstakeCommander\src\main\resources\com\meltstakecommander\meltstake.ico</icon>
+  <classPath>
+    <mainClass>com.meltstakecommander.Main</mainClass>
+  </classPath>
+  <jre>
+    <path>C:\Users\ROSS\.jdks\corretto-17.0.12</path>
+    <requiresJdk>false</requiresJdk>
+    <requires64Bit>false</requires64Bit>
+    <minVersion></minVersion>
+    <maxVersion></maxVersion>
+  </jre>
+</launch4jConfig>
