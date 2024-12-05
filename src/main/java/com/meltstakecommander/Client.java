@@ -31,7 +31,11 @@ public class Client {
         setNewSettings(settingsMap);
         configDataMap();
 
-        connect();
+        try {
+            startSocket(INPUTQUEUE, OUTPUTQUEUE);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     void setNewSettings(Map<String, Object> settingsMap) {
@@ -48,7 +52,6 @@ public class Client {
         }
     }
 
-
     public void setRestartTimer(boolean restartTimer) {
         this.restartTimer = restartTimer;
     }
@@ -61,17 +64,10 @@ public class Client {
         return confirmedARovrdStatus;
     }
 
-    public void connect() {
-        try {
-            startSocket(INPUTQUEUE, OUTPUTQUEUE);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public void sendData(String data) {
         OUTPUTQUEUE.offer(data);
     }
+
     public int getAntennaID() {return Integer.parseInt(settings.get("antenna").toString());}
 
     public String getDataDisplay1() {
@@ -121,11 +117,22 @@ public class Client {
         return INPUTQUEUE.poll();
     }
 
+    /**
+     *
+     * @return (true) if the last command was successfully send **TO THE ROV**
+     * Use the printout to see if the MeltStake received a command
+     */
     public boolean testConnection() {
         sendData(Commands.getDataCommand(getAntennaID(), "ROT"));
         return lastCommandStatus;
     }
 
+    /**
+     * Starts the threading for handling client to ROV interactions
+     * @param input outgoing command queue
+     * @param output incoming data queue
+     * @throws IOException hopefully this doesn't happen
+     */
     private void startSocket(LinkedBlockingQueue<String> input, LinkedBlockingQueue<String> output) throws IOException {
         new Thread(() -> socketReader(input)).start();
         new Thread(() -> socketWriter(output)).start();
