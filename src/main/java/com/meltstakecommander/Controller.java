@@ -39,6 +39,7 @@ public class Controller {
     public boolean releasing = false;
 
     Timeline timerTimeline = new Timeline();
+    Timeline pingTimeline = new Timeline();
 
     int REFRESH = 100; //MS
 
@@ -161,6 +162,20 @@ public class Controller {
         messages.appendText("\n" + message);
     }
 
+    private void startAutoPing() {
+        pingTimeline.stop();
+        pingTimeline.getKeyFrames().clear();
+
+
+        pingTimeline = new Timeline(
+                new KeyFrame(Duration.millis(Integer.parseInt(s.getData().get("pingRate").toString())),
+                        e -> onConnectButtonClick()
+                )
+        );
+
+        pingTimeline.setCycleCount(Animation.INDEFINITE); // loop forever
+        pingTimeline.play();
+    }
 
     private void stopTimerAnimation() {
         releasing = false;
@@ -333,16 +348,13 @@ public class Controller {
                 }
                 s.setDataAndSave(data);
                 c.setNewSettings(data);
+                startAutoPing();
                 settingsStage.close();
                 settingsOpened = false;
             });
 
 
             settingsBox.getChildren().add(saveButton);
-
-            Text disclaimer = new Text("Note: some changes require re-opening\nthe app to take effect");
-            settingsBox.getChildren().add(disclaimer);
-
 
             Scene settingsScene = new Scene(settingsBox);
             settingsStage.setScene(settingsScene);
@@ -363,11 +375,8 @@ public class Controller {
     @FXML
     public void initialize() {
         // Create a timeline that updates the label every second
-        Timeline timeline = new Timeline(
-                new KeyFrame(Duration.millis(Integer.parseInt(s.getData().get("pingRate").toString())),
-                    e -> onConnectButtonClick()
-                )
-        );
+        startAutoPing();
+
         Timeline textRefresh = new Timeline(
                 new KeyFrame(Duration.millis(REFRESH),
                         e -> refreshClient()
@@ -379,10 +388,6 @@ public class Controller {
         for (String data : Commands.getDataStrings()) {
             dataSelector.getItems().add(data);
         }
-
-
-        timeline.setCycleCount(Animation.INDEFINITE); // loop forever
-        timeline.play();
 
         textRefresh.setCycleCount(Animation.INDEFINITE);
         textRefresh.play();

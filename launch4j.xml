@@ -2,7 +2,7 @@
 <launch4jConfig>
   <dontWrapJar>false</dontWrapJar>
   <headerType>gui</headerType>
-  <jar>C:\Users\ROSS\MeltstakeCommander\target\MeltstakeCommander-1.0.jar</jar>
+  <jar>C:\Users\ROSS\MeltstakeCommander\target\MeltstakeCommander-1.1.jar</jar>
   <outfile>C:\Users\ROSS\Desktop\MeltStakeCommander\MeltStakeCommander.exe</outfile>
   <errTitle></errTitle>
   <cmdLine></cmdLine>
@@ -14,6 +14,10 @@
   <restartOnCrash>false</restartOnCrash>
   <manifest></manifest>
   <icon>C:\Users\ROSS\MeltstakeCommander\src\main\resources\com\meltstakecommander\meltstake.ico</icon>
+  <singleInstance>
+    <mutexName>Alpha</mutexName>
+    <windowTitle>MeltStakeCommander</windowTitle>
+  </singleInstance>
   <classPath>
     <mainClass>com.meltstakecommander.Main</mainClass>
   </classPath>
