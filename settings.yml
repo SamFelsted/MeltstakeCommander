@@ -1,2 +1,1 @@
-{ip: 192.168.2.2, antenna: '202', portOUT: '4000', portIN: '4001', pingRate: '60000',
-  refreshRate: '100'}
+{ip: 192.168.2.2, antenna: '202', portOUT: '4000', portIN: '4001', pingRate: '60000'}

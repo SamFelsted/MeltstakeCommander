@@ -40,6 +40,8 @@ public class Controller {
 
     Timeline timerTimeline = new Timeline();
 
+    int REFRESH = 100; //MS
+
     @FXML
     VBox Main;
     @FXML
@@ -201,7 +203,7 @@ public class Controller {
         timer.setFill(Color.BLACK);
 
         timerTimeline.getKeyFrames().add(
-            new KeyFrame(Duration.millis((double) Integer.parseInt(s.getData().get("refreshRate").toString()) / 2),
+            new KeyFrame(Duration.millis((double) REFRESH / 2),
                     e -> {
                         java.time.Duration remaining = java.time.Duration.between(LocalTime.now(), end);
                         if (!remaining.isNegative()) {
@@ -279,7 +281,7 @@ public class Controller {
         });
 
         Timeline autoEngageRefresh = new Timeline(
-                new KeyFrame(Duration.millis(Integer.parseInt(s.getData().get("refreshRate").toString())),
+                new KeyFrame(Duration.millis(REFRESH),
                         e -> {
                             if (c.getConfirmedARovrdStatus()) {
                                 autoReleaseButton.setText("Auto Release ON");
@@ -367,7 +369,7 @@ public class Controller {
                 )
         );
         Timeline textRefresh = new Timeline(
-                new KeyFrame(Duration.millis(Integer.parseInt(s.getData().get("refreshRate").toString())),
+                new KeyFrame(Duration.millis(REFRESH),
                         e -> refreshClient()
                 )
         );
